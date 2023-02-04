@@ -35,17 +35,30 @@ fn spawn_rofi (output_vec:Vec<String>) -> Result<usize, rofi::Error> {
 }
 
 fn main () {
-    let output = get_value(get_json_input());
+    let mut output = get_value(get_json_input());
+    match output.0.is_empty(){
+        true => {
+            output.0.push("Empty".to_string());
+        }
+        _ => {}
+    }
     let user_input:Result<usize, rofi::Error> = spawn_rofi(output.0);
     match &user_input {
         Ok(v) => {
             // v is the vector index Value
             let vec_id = output.1;
-            process::Command::new("dunstctl")
-                .arg("history-pop")
-                .arg(format!("{}",vec_id[*v]))
-                .spawn()
-                .expect("Failed to pop the Notifications!");
+            match vec_id.is_empty(){
+                true => {
+                   process::exit(0);
+                }
+                _ =>{
+                    process::Command::new("dunstctl")
+                        .arg("history-pop")
+                        .arg(format!("{}",vec_id[*v]))
+                        .spawn()
+                        .expect("Failed to pop the Notifications!");
+                    }
+            }
         }
         Err(e) => {
             println!("Error : {e}");
