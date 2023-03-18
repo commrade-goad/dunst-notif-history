@@ -27,9 +27,9 @@ fn get_value(json_input: String) -> (Vec<String>, Vec<i64>) {
     return (output_vec, output_vec_id);
 }
 
-fn spawn_rofi(output_vec: Vec<String>) -> Result<usize, rofi::Error> {
+fn spawn_rofi(output_vec: &Vec<String>, promt:&str) -> Result<usize, rofi::Error> {
     let selected = rofi::Rofi::new(&output_vec)
-        .prompt("  History ")
+        .prompt(promt)
         .run_index();
     return selected;
 }
@@ -41,11 +41,14 @@ fn main() {
             output.0.push("Empty".to_string());
         }
         _ => {
-            output.0.push("Clear All History".to_string());
+            output.0.push("> Clear all History".to_string());
+            output.0.push("> Remove specific History".to_string());
             output.1.push(-1);
+            output.1.push(-2);
+
         }
     }
-    let user_input: Result<usize, rofi::Error> = spawn_rofi(output.0);
+    let user_input: Result<usize, rofi::Error> = spawn_rofi(&output.0, "  History ");
     match &user_input {
         Ok(v) => {
             // v is the vector index Value
@@ -59,7 +62,23 @@ fn main() {
                         .arg("history-clear")
                         .spawn()
                         .expect("Failed to clear Dunst history")
-                }
+                },
+                -2 => {
+                    let rm_output = get_value(get_json_input());
+                    match spawn_rofi(&rm_output.0, "  Remove History "){
+                        Ok(v) =>{
+                            process::Command::new("dunstctl")
+                                .arg("history-rm")
+                                .arg(format!("{}", rm_output.1[v]))
+                                .spawn()
+                                .expect("Failed to remove the Notifications!")
+                        }
+                        Err(e) => {
+                            println!("Error : {e}");
+                            process::exit(1);
+                        }
+                    }
+                },
                 _ => {
                     process::Command::new("dunstctl")
                         .arg("history-pop")
