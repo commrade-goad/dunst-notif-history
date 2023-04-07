@@ -42,9 +42,11 @@ fn main() {
         }
         _ => {
             output.0.push("> Clear all History".to_string());
-            output.0.push("> Remove specific History".to_string());
             output.1.push(-1);
-            output.1.push(-2);
+            if output.0.len() != 2 {
+                output.0.push("> Remove specific History".to_string());
+                output.1.push(-2);
+            }
 
         }
     }
