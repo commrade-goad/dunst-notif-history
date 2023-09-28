@@ -50,7 +50,7 @@ fn main() {
 
         }
     }
-    let user_input: Result<usize, rofi::Error> = spawn_rofi(&output.0, "  History ");
+    let user_input: Result<usize, rofi::Error> = spawn_rofi(&output.0, " 󰂚 History ");
     match &user_input {
         Ok(v) => {
             // v is the vector index Value
@@ -67,7 +67,7 @@ fn main() {
                 },
                 -2 => {
                     let rm_output = get_value(get_json_input());
-                    match spawn_rofi(&rm_output.0, "  Remove History "){
+                    match spawn_rofi(&rm_output.0, " 󰂚 Remove History "){
                         Ok(v) =>{
                             process::Command::new("dunstctl")
                                 .arg("history-rm")
